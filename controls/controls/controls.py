@@ -34,20 +34,20 @@ class MinimalSubscriber(Node):
         # max_angle3 = 0.0
         # max_angle4 = 0.0
         #turning towards left
-        if(self.j.axes[2]<0):
+        if(self.j.axes[2]>0):
             self.max_angle1.data = (70*math.pi/180)*math.exp(-0.28*abs(self.velocity.data))                             #front left-defined postive by convention
             self.max_angle2.data = (90*math.pi/180 - math.atan((math.cos(self.max_angle1.data)/(math.sin(self.max_angle1.data)+0.00001))+0.8374))
-            self.max_angle3.data = -self.max_angle1.data
-            self.max_angle4.data = -self.max_angle2.data
+            self.max_angle3.data = -(self.max_angle1.data)
+            self.max_angle4.data = -(self.max_angle2.data)
 
             """In case of a left turn, the left wheel(denoted by angle1 is constrained at 70 degrees
             and the right wheel takes an absolute value of less than 70(from relation)"""
         #turning towards right
-        elif(self.j.axes[2]>=0): 
-            self.max_angle2.data = -((70*math.pi/180)*math.exp(-0.28*abs(self.velocity.data)))
-            self.max_angle1.data = -(90*math.pi/180 - math.atan((math.cos(self.max_angle2.data)/(math.sin(self.max_angle2.data)+0.00001))+0.8374))
-            self.max_angle3.data = -self.max_angle1.data
-            self.max_angle4.data = -self.max_angle2.data
+        elif(self.j.axes[2]<=0): 
+            self.max_angle2.data = ((70*math.pi/180)*math.exp(-0.28*abs(self.velocity.data)))
+            self.max_angle1.data = (90*math.pi/180 - math.atan((math.cos(self.max_angle2.data)/(math.sin(self.max_angle2.data)+0.00001))+0.8374))
+            self.max_angle3.data = -(self.max_angle1.data)
+            self.max_angle4.data = -(self.max_angle2.data)
         
         
         self.angle1.data=self.angle_factor*self.max_angle1.data
@@ -58,13 +58,13 @@ class MinimalSubscriber(Node):
         self.angle1_pub.publish(self.angle1)
         self.angle2_pub.publish(self.angle2)
         self.angle3_pub.publish(self.angle3)
-        self.angle4_pub.publish(self.angle1)
+        self.angle4_pub.publish(self.angle4)
 
 
     def controller_callback(self,msg):
         self.j = msg
         self.velocity.data = self.j.axes[1]  
-        self.velocity.data*=float(math.pow(2,63))
+        self.velocity.data*=20
         #x = self.velocity
         self.angle_factor = self.j.axes[2]
         print (self.velocity)
